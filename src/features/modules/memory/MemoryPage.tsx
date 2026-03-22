@@ -26,14 +26,14 @@ const ROOMS = [
 
 const MEMORY_ITEMS: MemoryItem[] = [
   // Vocab room
-  { id: 'v1', front: 'dog', back: 'Hund', room: 'vocab', emoji: '🐕' },
-  { id: 'v2', front: 'cat', back: 'Katze', room: 'vocab', emoji: '🐱' },
-  { id: 'v3', front: 'house', back: 'Haus', room: 'vocab', emoji: '🏠' },
-  { id: 'v4', front: 'tree', back: 'Baum', room: 'vocab', emoji: '🌳' },
-  { id: 'v5', front: 'sun', back: 'Sonne', room: 'vocab', emoji: '☀️' },
-  { id: 'v6', front: 'moon', back: 'Mond', room: 'vocab', emoji: '🌙' },
-  { id: 'v7', front: 'water', back: 'Wasser', room: 'vocab', emoji: '💧' },
-  { id: 'v8', front: 'fire', back: 'Feuer', room: 'vocab', emoji: '🔥' },
+  { id: 'v1', front: 'Hund', back: 'dog', room: 'vocab', emoji: '🐕' },
+  { id: 'v2', front: 'Katze', back: 'cat', room: 'vocab', emoji: '🐱' },
+  { id: 'v3', front: 'Haus', back: 'house', room: 'vocab', emoji: '🏠' },
+  { id: 'v4', front: 'Baum', back: 'tree', room: 'vocab', emoji: '🌳' },
+  { id: 'v5', front: 'Sonne', back: 'sun', room: 'vocab', emoji: '☀️' },
+  { id: 'v6', front: 'Mond', back: 'moon', room: 'vocab', emoji: '🌙' },
+  { id: 'v7', front: 'Wasser', back: 'water', room: 'vocab', emoji: '💧' },
+  { id: 'v8', front: 'Feuer', back: 'fire', room: 'vocab', emoji: '🔥' },
 
   // Formula room
   { id: 'f1', front: 'Fläche Rechteck', back: 'Länge × Breite', room: 'formulas', emoji: '📐' },

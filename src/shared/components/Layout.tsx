@@ -7,7 +7,7 @@ import { useStreakStore } from '../stores/streakStore'
 import { useInventoryStore } from '../stores/inventoryStore'
 import { useAudioStore } from '../stores/audioStore'
 import { musicEngine } from '../utils/musicEngine'
-import { AvatarMini } from './AvatarSVG'
+import { AvatarMini } from './AvatarMini'
 import { CoinDisplay } from './CoinDisplay'
 import { XPBar } from './XPBar'
 

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '../../shared/components/Button'
 import { Card } from '../../shared/components/Card'
-import { AvatarSVG } from '../../shared/components/AvatarSVG'
+import { AvatarPixi } from '../../shared/components/AvatarPixi'
 import { useUserStore, type HairStyle, type SkinTone, type EyeStyle, type AuraColor, type FaceExpression } from '../../shared/stores/userStore'
 import { useInventoryStore, SHOP_ITEMS } from '../../shared/stores/inventoryStore'
 
@@ -95,26 +95,19 @@ export default function AvatarPage() {
     <div className="max-w-4xl mx-auto">
       <h1 className="text-3xl mb-4 text-theme text-center neon-text">Avatar-Editor</h1>
 
-      {/* Avatar Preview with platform */}
+      {/* Avatar Preview with PixiJS effects */}
       <div className="flex justify-center mb-4 relative">
-        <motion.div
-          animate={{ y: [0, -6, 0] }}
-          transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
-          className="relative"
-        >
-          <AvatarSVG
-            hairColor={avatarConfig.hairColor}
-            hairStyle={hairStyle}
-            skinTone={skinTone}
-            eyeStyle={eyeStyle}
-            aura={aura}
-            expression={expression}
-            outfitId={equippedOutfit}
-            accessoryId={equippedAccessory}
-            size={240}
-            idle
-          />
-        </motion.div>
+        <AvatarPixi
+          hairColor={avatarConfig.hairColor}
+          hairStyle={hairStyle}
+          skinTone={skinTone}
+          eyeStyle={eyeStyle}
+          aura={aura}
+          expression={expression}
+          outfitId={equippedOutfit}
+          accessoryId={equippedAccessory}
+          size={240}
+        />
       </div>
 
       <p className="text-center text-base text-secondary mb-4 font-body font-bold">{name}</p>

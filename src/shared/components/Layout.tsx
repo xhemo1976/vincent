@@ -7,7 +7,7 @@ import { useStreakStore } from '../stores/streakStore'
 import { useInventoryStore } from '../stores/inventoryStore'
 import { useAudioStore } from '../stores/audioStore'
 import { musicEngine } from '../utils/musicEngine'
-import { AvatarMini } from './AvatarMini'
+import { SpriteAvatarMini } from './SpriteAvatar'
 import { CoinDisplay } from './CoinDisplay'
 import { XPBar } from './XPBar'
 
@@ -175,11 +175,10 @@ export function Layout({ children }: LayoutProps) {
               className="shrink-0 cursor-pointer rounded-full overflow-hidden neon-border"
               onClick={() => navigate('/avatar')}
             >
-              <AvatarMini
-                hairColor={avatarConfig.hairColor}
-                hairStyle={avatarConfig.hairStyle || 'spiky'}
+              <SpriteAvatarMini
                 skinTone={avatarConfig.skinTone || '#FFDAB9'}
-                eyeStyle={avatarConfig.eyeStyle || 'sharp'}
+                hairStyle={avatarConfig.hairStyle || 'spiky'}
+                hairColor={avatarConfig.hairColor}
                 outfitId={equippedOutfit}
                 size={38}
               />

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '../../shared/components/Button'
 import { Card } from '../../shared/components/Card'
-import { AvatarPixi } from '../../shared/components/AvatarPixi'
+import { SpriteAvatar } from '../../shared/components/SpriteAvatar'
 import { useUserStore, type HairStyle, type SkinTone, type EyeStyle, type AuraColor, type FaceExpression } from '../../shared/stores/userStore'
 import { useInventoryStore, SHOP_ITEMS } from '../../shared/stores/inventoryStore'
 
@@ -95,18 +95,15 @@ export default function AvatarPage() {
     <div className="max-w-4xl mx-auto">
       <h1 className="text-3xl mb-4 text-theme text-center neon-text">Avatar-Editor</h1>
 
-      {/* Avatar Preview with PixiJS effects */}
+      {/* Avatar Preview - LPC Sprite based */}
       <div className="flex justify-center mb-4 relative">
-        <AvatarPixi
-          hairColor={avatarConfig.hairColor}
-          hairStyle={hairStyle}
+        <SpriteAvatar
           skinTone={skinTone}
-          eyeStyle={eyeStyle}
-          aura={aura}
-          expression={expression}
+          hairStyle={hairStyle}
+          hairColor={avatarConfig.hairColor}
           outfitId={equippedOutfit}
-          accessoryId={equippedAccessory}
-          size={240}
+          aura={aura}
+          size={256}
         />
       </div>
 

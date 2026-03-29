@@ -18,12 +18,41 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700;800&family=Playwrite+DE+SAS:wght@100;200;300;400&display=swap"
       rel="stylesheet"
     />
   </head>
-  <body>
-    <div id="root"></div>
+  <body style="background:#0a0a14;color:#e8e6f0;font-family:sans-serif;">
+    <div id="root">
+      <div id="loading-fallback" style="display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:12px;">
+        <div style="font-size:48px;">🥋</div>
+        <div>Laden...</div>
+      </div>
+    </div>
+    <script>
+      // Force-unregister stale service workers and clear caches
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(regs) {
+          regs.forEach(function(r) { r.unregister(); });
+        });
+        if ('caches' in window) {
+          caches.keys().then(function(names) {
+            names.forEach(function(name) { caches.delete(name); });
+          });
+        }
+      }
+      // Debug: catch and display any errors
+      window.addEventListener('error', function(e) {
+        var el = document.getElementById('loading-fallback');
+        if (el) el.innerHTML = '<div style="color:red;padding:20px;max-width:600px;word-break:break-all;">'
+          + '<h2>Fehler:</h2><pre>' + e.message + '\n' + (e.filename || '') + ':' + (e.lineno || '') + '</pre></div>';
+      });
+      window.addEventListener('unhandledrejection', function(e) {
+        var el = document.getElementById('loading-fallback');
+        if (el) el.innerHTML = '<div style="color:orange;padding:20px;max-width:600px;word-break:break-all;">'
+          + '<h2>Promise Fehler:</h2><pre>' + (e.reason && e.reason.message ? e.reason.message : String(e.reason)) + '</pre></div>';
+      });
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

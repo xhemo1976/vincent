@@ -11,7 +11,6 @@ import { evaluateHandwriting } from '../utils/strokeMatcher'
 import { TemplatePreview } from './TemplatePreview'
 import { useHandwritingCanvas } from '../hooks/useHandwritingCanvas'
 import { StarRating } from './StarRating'
-import { drawLineatur } from './Lineatur'
 import type { SASLetter, EvaluationResult } from '../types'
 
 const CHALLENGE_TIME = 20

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useUserStore, type ThemeColor } from '../../shared/stores/userStore'
 import { useStreakStore } from '../../shared/stores/streakStore'
@@ -94,12 +94,6 @@ export default function OnboardingPage() {
                   Weiter →
                 </Button>
               </div>
-              <Link
-                to="/login"
-                className="block text-center text-sm text-secondary font-body hover:text-primary transition-colors mt-4"
-              >
-                Schon ein Konto? Einloggen
-              </Link>
             </motion.div>
           )}
 

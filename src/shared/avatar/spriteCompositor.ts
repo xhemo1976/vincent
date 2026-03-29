@@ -81,8 +81,89 @@ export const OUTFIT_MAP: Record<string, string> = {
   'gi-phoenix': 'longsleeve_red',
 }
 
-// Layer z-order for compositing
-const LAYERS = ['body', 'legs', 'torso', 'hair'] as const
+// Skin tone hex values for procedural head drawing
+const SKIN_HEX: Record<string, string> = {
+  light: '#FFDAB9',
+  olive: '#F5CBA7',
+  bronze: '#D4A574',
+  brown: '#A0785A',
+  black: '#6B4226',
+}
+
+function darken(hex: string, amount: number): string {
+  const n = parseInt(hex.replace('#', ''), 16)
+  const r = Math.max(0, ((n >> 16) & 0xFF) - amount)
+  const g = Math.max(0, ((n >> 8) & 0xFF) - amount)
+  const b = Math.max(0, (n & 0xFF) - amount)
+  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`
+}
+
+/** Draw a pixel-art head on the canvas.
+ *  Positioned to sit directly on the body's neck stump (~y20). */
+function drawHead(ctx: CanvasRenderingContext2D, skinTone: string, outputSize: number) {
+  const skin = SKIN_HEX[skinTone] || SKIN_HEX.light
+  const skinDark = darken(skin, 30)
+  const px = outputSize / 64
+  // Y offset — push head down to sit on body shoulders
+  const oy = 13
+
+  // Neck
+  ctx.fillStyle = skin
+  ctx.fillRect(28 * px, (18 + oy) * px, 8 * px, 4 * px)
+
+  // Head oval
+  ctx.fillStyle = skin
+  roundRect(ctx, 21 * px, (4 + oy) * px, 22 * px, 16 * px, 7 * px)
+  ctx.fill()
+
+  // Ears
+  ctx.fillStyle = skin
+  ctx.fillRect(19 * px, (10 + oy) * px, 3 * px, 5 * px)
+  ctx.fillRect(42 * px, (10 + oy) * px, 3 * px, 5 * px)
+  ctx.fillStyle = skinDark
+  ctx.fillRect(19 * px, (12 + oy) * px, 2 * px, 2 * px)
+  ctx.fillRect(43 * px, (12 + oy) * px, 2 * px, 2 * px)
+
+  // Eyes
+  ctx.fillStyle = '#FFFFFF'
+  ctx.fillRect(25 * px, (11 + oy) * px, 4 * px, 3 * px)
+  ctx.fillRect(35 * px, (11 + oy) * px, 4 * px, 3 * px)
+
+  // Pupils
+  ctx.fillStyle = '#1a1a2e'
+  ctx.fillRect(26 * px, (12 + oy) * px, 3 * px, 2 * px)
+  ctx.fillRect(36 * px, (12 + oy) * px, 3 * px, 2 * px)
+
+  // Eye shine
+  ctx.fillStyle = '#FFFFFF'
+  ctx.fillRect(27 * px, (12 + oy) * px, 1 * px, 1 * px)
+  ctx.fillRect(37 * px, (12 + oy) * px, 1 * px, 1 * px)
+
+  // Nose
+  ctx.fillStyle = skinDark
+  ctx.fillRect(31 * px, (15 + oy) * px, 2 * px, 2 * px)
+
+  // Mouth
+  ctx.fillStyle = darken(skin, 50)
+  ctx.fillRect(29 * px, (18 + oy) * px, 6 * px, 1 * px)
+}
+
+function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+  ctx.beginPath()
+  ctx.moveTo(x + r, y)
+  ctx.lineTo(x + w - r, y)
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r)
+  ctx.lineTo(x + w, y + h - r)
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h)
+  ctx.lineTo(x + r, y + h)
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r)
+  ctx.lineTo(x, y + r)
+  ctx.quadraticCurveTo(x, y, x + r, y)
+  ctx.closePath()
+}
+
+// Layer z-order for compositing (head drawn procedurally)
+const LAYERS = ['body', 'legs', 'torso'] as const
 
 export async function compositeAvatar(
   config: SpriteAvatarConfig,
@@ -94,20 +175,17 @@ export async function compositeAvatar(
   const ctx = canvas.getContext('2d')
   if (!ctx) throw new Error('No canvas 2d context')
 
-  // Disable image smoothing for crisp pixel art upscaling
   ctx.imageSmoothingEnabled = false
 
   const basePath = '/sprites'
 
-  // Build layer URLs
   const layerUrls: Record<string, string> = {
     body: `${basePath}/body/${config.skinTone}.png`,
     legs: `${basePath}/legs/${config.legs}.png`,
     torso: `${basePath}/torso/${config.torso}.png`,
-    hair: getHairUrl(basePath, config.hairStyle, config.hairColor),
   }
 
-  // Load all images in parallel
+  // Load sprite layers
   const images: Record<string, HTMLImageElement | null> = {}
   await Promise.all(
     LAYERS.map(async (layer) => {
@@ -119,42 +197,56 @@ export async function compositeAvatar(
     })
   )
 
-  // Composite each layer - extract front-facing idle frame
+  // Load hair separately
+  let hairImg: HTMLImageElement | null = null
+  const hairUrl = getHairUrl(basePath, config.hairStyle, config.hairColor)
+  try {
+    hairImg = await loadImage(hairUrl)
+  } catch {
+    // Try base style without color
+    try {
+      hairImg = await loadImage(`${basePath}/hair/${config.hairStyle}.png`)
+    } catch {
+      // Try spiked_black as last resort
+      try {
+        hairImg = await loadImage(`${basePath}/hair/spiked_black.png`)
+      } catch { /* no hair */ }
+    }
+  }
+
+  // Draw body layers
   for (const layer of LAYERS) {
     const img = images[layer]
     if (!img) continue
-
-    // Calculate source position for front-facing idle frame
     const sx = FRONT_COL * FRAME_W
     const sy = FRONT_ROW * FRAME_H
+    ctx.drawImage(img, sx, sy, FRAME_W, FRAME_H, 0, 0, outputSize, outputSize)
+  }
 
-    ctx.drawImage(
-      img,
-      sx, sy, FRAME_W, FRAME_H, // source rect
-      0, 0, outputSize, outputSize // dest rect (scaled up)
-    )
+  // Draw procedural head
+  drawHead(ctx, config.skinTone, outputSize)
+
+  // Draw hair on top
+  if (hairImg) {
+    const sx = FRONT_COL * FRAME_W
+    const sy = FRONT_ROW * FRAME_H
+    ctx.drawImage(hairImg, sx, sy, FRAME_W, FRAME_H, 0, 0, outputSize, outputSize)
   }
 
   return canvas
 }
 
 function getHairUrl(basePath: string, style: string, color: string): string {
-  // First try style-specific color variant
-  // e.g., /sprites/hair/spiked_blue.png
+  if (!color) return `${basePath}/hair/${style}.png`
   return `${basePath}/hair/${style}_${color}.png`
 }
 
-// Fallback: try generic style (black) if color variant doesn't exist
+// Hair fallback is now handled inside compositeAvatar
 export async function compositeAvatarWithFallback(
   config: SpriteAvatarConfig,
   outputSize: number = 256
 ): Promise<HTMLCanvasElement> {
-  try {
-    return await compositeAvatar(config, outputSize)
-  } catch {
-    // Try with black hair fallback
-    return await compositeAvatar({ ...config, hairColor: 'black' }, outputSize)
-  }
+  return compositeAvatar(config, outputSize)
 }
 
 // Pre-generate a data URL for use in img tags

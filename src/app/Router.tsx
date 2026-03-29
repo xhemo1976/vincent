@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useUserStore } from '../shared/stores/userStore'
+import { useAuth } from '../shared/lib/AuthProvider'
 import { Layout } from '../shared/components/Layout'
 
 const OnboardingPage = lazy(() => import('../features/onboarding/OnboardingPage'))
@@ -29,14 +30,29 @@ function LoadingSpinner() {
   )
 }
 
+function RequireAuth({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth()
+  if (!user) return <Navigate to="/login" replace />
+  return <>{children}</>
+}
+
 function RequireOnboarding({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth()
   const { isOnboarded } = useUserStore()
+  if (!user) return <Navigate to="/login" replace />
   if (!isOnboarded) return <Navigate to="/onboarding" replace />
   return <>{children}</>
 }
 
 export function AppRouter() {
+  const { user } = useAuth()
   const { isOnboarded } = useUserStore()
+
+  const getDefaultRoute = () => {
+    if (!user) return '/login'
+    if (!isOnboarded) return '/onboarding'
+    return '/dashboard'
+  }
 
   return (
     <Layout>
@@ -44,10 +60,17 @@ export function AppRouter() {
         <Routes>
           <Route
             path="/"
-            element={<Navigate to={isOnboarded ? '/dashboard' : '/onboarding'} replace />}
+            element={<Navigate to={getDefaultRoute()} replace />}
           />
-          <Route path="/onboarding" element={<OnboardingPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/onboarding"
+            element={
+              <RequireAuth>
+                <OnboardingPage />
+              </RequireAuth>
+            }
+          />
           <Route
             path="/dashboard"
             element={

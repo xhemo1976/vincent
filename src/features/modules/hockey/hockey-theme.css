@@ -1,0 +1,18 @@
+/* Arena der Staerke — Hockey Module Theme */
+.hockey-arena {
+  --color-primary: #2E7D32;
+  --color-primary-light: #4CAF50;
+  --color-primary-dark: #1B5E20;
+  --color-primary-rgb: 46, 125, 50;
+  --color-accent: #FF9800;
+  --color-field: #388E3C;
+  --color-field-line: rgba(255, 255, 255, 0.8);
+}
+
+[data-mode="dark"] .hockey-arena {
+  --color-primary: #4CAF50;
+  --color-primary-light: #66BB6A;
+  --color-primary-dark: #2E7D32;
+  --color-primary-rgb: 76, 175, 80;
+  --color-accent: #FFB74D;
+}

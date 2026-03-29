@@ -127,7 +127,7 @@
 }
 
 html {
-  font-size: 26px;
+  font-size: 16px;
 }
 
 body {
@@ -159,8 +159,8 @@ h3 { font-size: 1.4rem; }
 
 /* Touch targets */
 button, a, [role="button"] {
-  min-height: 57px;
-  min-width: 57px;
+  min-height: 44px;
+  min-width: 44px;
 }
 
 /* Scrollbar styling */

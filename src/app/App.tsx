@@ -11,20 +11,13 @@ import InstallPrompt from '../shared/components/InstallPrompt'
 export default function App() {
   const { theme, darkMode, isOnboarded } = useUserStore()
   const { checkStreak } = useStreakStore()
-  const { user, loading, signInAnonymously } = useAuth()
+  const { loading } = useAuth()
 
   // Apply theme + dark mode to document
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
     document.documentElement.setAttribute('data-mode', darkMode ? 'dark' : 'light')
   }, [theme, darkMode])
-
-  // Auto anonymous auth
-  useEffect(() => {
-    if (!loading && !user) {
-      signInAnonymously()
-    }
-  }, [loading, user, signInAnonymously])
 
   // Check streak on app load
   useEffect(() => {

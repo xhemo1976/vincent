@@ -7,6 +7,7 @@ interface AuthCtx {
   session: Session | null
   loading: boolean
   signInAnonymously: () => Promise<void>
+  signUp: (email: string, password: string) => Promise<{ error: string | null }>
   linkEmail: (email: string, password: string) => Promise<{ error: string | null }>
   signInWithEmail: (email: string, password: string) => Promise<{ error: string | null }>
   signOut: () => Promise<void>
@@ -17,6 +18,7 @@ const AuthContext = createContext<AuthCtx>({
   session: null,
   loading: true,
   signInAnonymously: async () => {},
+  signUp: async () => ({ error: null }),
   linkEmail: async () => ({ error: null }),
   signInWithEmail: async () => ({ error: null }),
   signOut: async () => {},
@@ -56,6 +58,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signInAnonymously()
   }
 
+  const signUp = async (email: string, password: string) => {
+    if (!supabase) return { error: 'Supabase nicht konfiguriert' }
+    const { error } = await supabase.auth.signUp({ email, password })
+    return { error: error?.message ?? null }
+  }
+
   const linkEmail = async (email: string, password: string) => {
     if (!supabase) return { error: 'Supabase nicht konfiguriert' }
     const { error } = await supabase.auth.updateUser({ email, password })
@@ -74,7 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signInAnonymously, linkEmail, signInWithEmail, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, signInAnonymously, signUp, linkEmail, signInWithEmail, signOut }}>
       {children}
     </AuthContext.Provider>
   )

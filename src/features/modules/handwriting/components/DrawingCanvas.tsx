@@ -1,6 +1,5 @@
 import { useHandwritingCanvas } from '../hooks/useHandwritingCanvas'
 import type { SASLetter } from '../types'
-import { drawLineatur } from './Lineatur'
 import { useEffect } from 'react'
 
 interface DrawingCanvasProps {

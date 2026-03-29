@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Button } from '../../shared/components/Button'
 import { Card } from '../../shared/components/Card'
@@ -43,28 +44,10 @@ export default function SettingsPage() {
   const { bronze, silver, gold } = useCoinsStore()
   const { currentStreak, longestStreak } = useStreakStore()
   const { getBestHour, getModuleStats, getWeeklyXP } = useAnalyticsStore()
-  const { user, linkEmail } = useAuth()
+  const navigate = useNavigate()
+  const { user, signOut } = useAuth()
   const [editName, setEditName] = useState(name)
   const [showNameEdit, setShowNameEdit] = useState(false)
-  const [linkEmailVal, setLinkEmailVal] = useState('')
-  const [linkPassword, setLinkPassword] = useState('')
-  const [linkMsg, setLinkMsg] = useState('')
-  const [linkLoading, setLinkLoading] = useState(false)
-  const isAnonymous = user?.is_anonymous ?? true
-
-  const handleLinkEmail = async () => {
-    if (!linkEmailVal || !linkPassword) return
-    setLinkLoading(true)
-    setLinkMsg('')
-    const { error } = await linkEmail(linkEmailVal, linkPassword)
-    setLinkLoading(false)
-    if (error) {
-      setLinkMsg(error)
-    } else {
-      setLinkMsg('Konto gesichert! Du kannst dich jetzt auf anderen Geräten einloggen.')
-    }
-  }
-
   const bestHour = getBestHour()
   const moduleStats = getModuleStats()
   const weeklyXP = getWeeklyXP()
@@ -279,47 +262,23 @@ export default function SettingsPage() {
         </Card>
       )}
 
-      {/* Link Email */}
+      {/* Konto */}
       <Card className="mb-4">
-        <h3 className="font-title text-lg text-theme mb-2">Fortschritt sichern</h3>
-        {isAnonymous ? (
-          <div className="space-y-3">
-            <p className="text-sm text-secondary font-body">
-              Verknüpfe eine E-Mail, um deinen Fortschritt auf anderen Geräten zu nutzen.
-            </p>
-            <input
-              type="email"
-              value={linkEmailVal}
-              onChange={(e) => setLinkEmailVal(e.target.value)}
-              placeholder="E-Mail"
-              className="w-full px-3 py-2 rounded-lg border-2 border-primary/20 bg-theme text-theme text-sm font-body focus:border-primary focus:outline-none"
-            />
-            <input
-              type="password"
-              value={linkPassword}
-              onChange={(e) => setLinkPassword(e.target.value)}
-              placeholder="Passwort (min. 6 Zeichen)"
-              className="w-full px-3 py-2 rounded-lg border-2 border-primary/20 bg-theme text-theme text-sm font-body focus:border-primary focus:outline-none"
-            />
-            {linkMsg && (
-              <p className={`text-sm font-body ${linkMsg.includes('gesichert') ? 'text-green-500' : 'text-red-500'}`}>
-                {linkMsg}
-              </p>
-            )}
-            <Button
-              onClick={handleLinkEmail}
-              disabled={linkLoading || !linkEmailVal || linkPassword.length < 6}
-              size="sm"
-              className="w-full"
-            >
-              {linkLoading ? 'Laden...' : 'E-Mail verknüpfen'}
-            </Button>
-          </div>
-        ) : (
-          <p className="text-sm text-green-500 font-body">
-            Konto gesichert mit E-Mail. Du kannst dich auf anderen Geräten einloggen.
-          </p>
-        )}
+        <h3 className="font-title text-lg text-theme mb-2">Konto</h3>
+        <p className="text-sm text-secondary font-body mb-3">
+          Eingeloggt als <strong className="text-primary">{user?.email}</strong>
+        </p>
+        <Button
+          variant="danger"
+          size="sm"
+          className="w-full"
+          onClick={async () => {
+            await signOut()
+            navigate('/login')
+          }}
+        >
+          Ausloggen
+        </Button>
       </Card>
 
       <div className="text-center text-xs text-secondary mt-8 font-body">
